@@ -7,12 +7,12 @@ Lock for Android
 
 [AuthOK](https://authok.cn) is an authentication broker that supports social identity providers as well as enterprise identity providers such as Active Directory, LDAP, Google Apps and Salesforce.
 
-## Key features
+## 关键特性
 
 * **Integrates** your Android app with **AuthOK**.
 * Provides a **beautiful native UI** to log your users in.
 * Provides support for **Social Providers** (Facebook, Twitter, etc.), **Enterprise Providers** (AD, LDAP, etc.) and **Username & Password**.
-* Provides Passwordless authentication using **SMS** and **Email**.
+* 提供了 **短信** 和 **邮箱** 等免密认证.
 
 ## Users from lock-android v2
 If you are migrating from the previous major version of this library, make sure to check out the [Migration Guide](MIGRATION_GUIDE.md) we prepared for you.
