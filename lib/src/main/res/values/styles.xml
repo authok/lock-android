@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ styles.xml
+  ~
+  ~ Copyright (c) 2022 Authok (http://authok.cn)
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in
+  ~ all copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  ~ THE SOFTWARE.
+  -->
+
+<resources>
+
+    <style name="Lock.Theme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorAccent">?attr/Authok.PrimaryColor</item>
+        <item name="colorPrimaryDark">?attr/Authok.HeaderBackground</item>
+        <item name="android:textColorHighlight">@color/cn_authok_lock_link_focused</item>
+        <item name="android:windowBackground">@color/cn_authok_lock_form_background</item>
+        <item name="Authok.HeaderLogo">@drawable/cn_authok_lock_header_logo</item>
+        <item name="Authok.HeaderTitle">@string/cn_authok_lock_header_title</item>
+        <item name="Authok.HeaderTitleColor">@color/cn_authok_lock_text</item>
+        <item name="Authok.HeaderBackground">@color/cn_authok_lock_header_background</item>
+        <item name="Authok.PrimaryColor">@color/cn_authok_lock_submit_normal</item>
+        <item name="Authok.DarkPrimaryColor">@color/cn_authok_lock_submit_pressed</item>
+    </style>
+
+    <style name="Lock.Theme.AuthStyle">
+        <item name="Authok.BackgroundColor">@color/cn_authok_lock_social_unknown</item>
+        <item name="Authok.Name" />
+        <item name="Authok.Logo">@drawable/cn_authok_lock_ic_social_authok</item>
+    </style>
+
+    <style name="Lock.Theme.ActionBar" parent="Theme.AppCompat.Light.DarkActionBar" />
+
+    <style name="Lock.Theme.Text">
+        <item name="android:textStyle">normal</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/cn_authok_lock_text</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="Lock.Theme.TextAppearance.Tab" parent="TextAppearance.AppCompat.Button">
+        <item name="android:textSize">@dimen/cn_authok_lock_tab_text</item>
+        <item name="android:textColor">@color/cn_authok_lock_tab_text</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="Lock.Theme.Text.PasswordPolicy">
+        <item name="android:textSize">@dimen/cn_authok_lock_field_error_text</item>
+        <item name="android:layout_gravity">start</item>
+        <item name="android:textAlignment">viewStart</item>
+    </style>
+
+    <style name="Lock.Theme.Text.ValidationError">
+        <item name="android:textColor">@color/cn_authok_lock_validation_error_text</item>
+        <item name="android:textSize">@dimen/cn_authok_lock_field_error_text</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:layout_gravity">start</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_marginTop">
+            @dimen/cn_authok_lock_widget_vertical_margin_field_with_error
+        </item>
+        <item name="android:textAlignment">viewStart</item>
+    </style>
+
+    <style name="Lock.Theme.Text.Terms">
+        <item name="android:gravity">center</item>
+        <item name="android:lineSpacingExtra">@dimen/cn_authok_lock_terms_text_spacing</item>
+        <item name="android:textColor">@color/cn_authok_lock_terms_text</item>
+        <item name="android:textSize">@dimen/cn_authok_lock_terms_text</item>
+    </style>
+
+    <style name="Lock.Theme.Text.SSO">
+        <item name="android:layout_marginLeft">
+            @dimen/cn_authok_lock_widget_horizontal_margin_small
+        </item>
+        <item name="android:textColor">@color/cn_authok_lock_sso_text</item>
+        <item name="android:textSize">@dimen/cn_authok_lock_sso_text</item>
+        <item name="android:layout_marginStart">
+            @dimen/cn_authok_lock_widget_horizontal_margin_small
+        </item>
+    </style>
+
+    <style name="Lock.Theme.Text.ListItem">
+        <item name="android:layout_marginLeft">
+            @dimen/cn_authok_lock_widget_horizontal_margin_small
+        </item>
+        <item name="android:layout_height">@dimen/cn_authok_lock_list_item_height</item>
+        <item name="android:textSize">@dimen/cn_authok_lock_list_item_text</item>
+        <item name="android:layout_marginStart">
+            @dimen/cn_authok_lock_widget_horizontal_margin_small
+        </item>
+    </style>
+
+    <style name="Lock.Theme.Text.Link">
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:layout_marginTop">@dimen/cn_authok_lock_widget_vertical_margin_link
+        </item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:padding">@dimen/cn_authok_lock_widget_vertical_margin_field</item>
+        <item name="android:textSize">@dimen/cn_authok_lock_small_clickable_text</item>
+    </style>
+
+    <style name="Lock.Theme.Text.ErrorLink" parent="Lock.Theme.Text.Link">
+        <item name="android:layout_marginTop">0dp</item>
+        <item name="android:textColor">@color/cn_authok_lock_error_link</item>
+        <item name="android:textSize">@dimen/cn_authok_lock_subtitle_error_text</item>
+        <item name="android:layout_marginLeft">@dimen/cn_authok_lock_widget_horizontal_margin</item>
+        <item name="android:layout_marginRight">@dimen/cn_authok_lock_widget_horizontal_margin
+        </item>
+        <item name="android:layout_marginStart">@dimen/cn_authok_lock_widget_horizontal_margin
+        </item>
+        <item name="android:layout_marginEnd">@dimen/cn_authok_lock_widget_horizontal_margin
+        </item>
+    </style>
+
+    <style name="Lock.Theme.Text.Title">
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:layout_marginBottom">
+            @dimen/cn_authok_lock_widget_vertical_margin_field
+        </item>
+        <item name="android:lineSpacingExtra">@dimen/cn_authok_lock_title_text_spacing</item>
+        <item name="android:textSize">@dimen/cn_authok_lock_title_text</item>
+    </style>
+
+    <style name="Lock.Theme.Text.Title.ResetPassword">
+        <item name="android:textSize">@dimen/cn_authok_lock_change_password_title_text</item>
+    </style>
+
+    <style name="Lock.Theme.Text.Title.SignUpCustomFields">
+        <item name="android:textSize">@dimen/cn_authok_lock_sign_up_custom_fields_title_text</item>
+    </style>
+
+    <style name="Lock.Theme.Text.Subtitle.ResetPassword" parent="Lock.Theme.Text.Title">
+        <item name="android:textSize">@dimen/cn_authok_lock_title_text</item>
+        <item name="android:lineSpacingExtra">@dimen/cn_authok_lock_subtitle_text_spacing</item>
+        <item name="android:layout_marginLeft">@dimen/cn_authok_lock_widget_horizontal_margin</item>
+        <item name="android:layout_marginRight">@dimen/cn_authok_lock_widget_horizontal_margin
+        </item>
+        <item name="android:layout_marginStart">@dimen/cn_authok_lock_widget_horizontal_margin
+        </item>
+        <item name="android:layout_marginEnd">@dimen/cn_authok_lock_widget_horizontal_margin
+        </item>
+    </style>
+
+    <style name="Lock.Theme.Text.Title.Error">
+        <item name="android:textSize">@dimen/cn_authok_lock_title_error_text</item>
+        <item name="android:textColor">@color/cn_authok_lock_passwordless_link_sent_text</item>
+        <item name="android:layout_marginLeft">@dimen/cn_authok_lock_widget_horizontal_margin</item>
+        <item name="android:layout_marginRight">@dimen/cn_authok_lock_widget_horizontal_margin
+        </item>
+        <item name="android:layout_marginStart">@dimen/cn_authok_lock_widget_horizontal_margin
+        </item>
+        <item name="android:layout_marginEnd">@dimen/cn_authok_lock_widget_horizontal_margin
+        </item>
+    </style>
+
+    <style name="Lock.Theme.Text.Subtitle.Error" parent="Lock.Theme.Text.Title">
+        <item name="android:lineSpacingExtra">@dimen/cn_authok_lock_subtitle_text_spacing</item>
+        <item name="android:layout_marginBottom">
+            @dimen/cn_authok_lock_widget_vertical_margin_passwordless
+        </item>
+        <item name="android:textSize">@dimen/cn_authok_lock_subtitle_error_text</item>
+        <item name="android:layout_marginLeft">@dimen/cn_authok_lock_widget_horizontal_margin</item>
+        <item name="android:layout_marginRight">@dimen/cn_authok_lock_widget_horizontal_margin
+        </item>
+        <item name="android:layout_marginStart">@dimen/cn_authok_lock_widget_horizontal_margin
+        </item>
+        <item name="android:layout_marginEnd">@dimen/cn_authok_lock_widget_horizontal_margin
+        </item>
+    </style>
+
+    <style name="Lock.Theme.Text.SocialButton">
+        <item name="android:gravity">center|start</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:paddingLeft">@dimen/cn_authok_lock_widget_with_text_horizontal_padding
+        </item>
+        <item name="android:paddingRight">
+            @dimen/cn_authok_lock_widget_with_text_horizontal_padding
+        </item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textSize">@dimen/cn_authok_lock_social_button_text</item>
+        <item name="android:textColor">@color/cn_authok_lock_social_text</item>
+        <item name="android:layout_gravity">start</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:paddingStart">@dimen/cn_authok_lock_widget_with_text_horizontal_padding
+        </item>
+        <item name="android:paddingEnd">
+            @dimen/cn_authok_lock_widget_with_text_horizontal_padding
+        </item>
+        <item name="android:textAlignment">viewStart</item>
+    </style>
+
+    <style name="Lock.Theme.Text.ResultMessage">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_alignParentTop">true</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:singleLine">false</item>
+        <item name="android:lineSpacingExtra">@dimen/cn_authok_lock_result_message_text_spacing
+        </item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingBottom">@dimen/cn_authok_lock_widget_small_margin</item>
+        <item name="android:paddingTop">@dimen/cn_authok_lock_widget_small_margin</item>
+        <item name="android:textColor">@color/cn_authok_lock_result_message</item>
+        <item name="android:textSize">@dimen/cn_authok_lock_result_message_text</item>
+    </style>
+
+    <style name="Lock.Theme.Widget">
+        <item name="android:layout_height">@dimen/cn_authok_lock_widget_height</item>
+        <item name="android:layout_width">match_parent</item>
+    </style>
+
+    <style name="Lock.Theme.Widget.Icon">
+        <item name="android:layout_gravity">center</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:padding">@dimen/cn_authok_lock_widget_field_icon_padding</item>
+        <item name="android:layout_width">@dimen/cn_authok_lock_widget_height</item>
+    </style>
+
+    <style name="Lock.Theme.Widget.Icon.Social">
+        <item name="android:layout_width">@dimen/cn_authok_lock_widget_height</item>
+    </style>
+
+    <style name="Lock.Theme.Widget.Icon.PasswordVisibilityToggle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:padding">@dimen/cn_authok_lock_input_field_stroke_width</item>
+        <item name="android:tint">@color/cn_authok_lock_hint_text</item>
+        <item name="android:src">@drawable/cn_authok_lock_ic_password_hidden</item>
+        <item name="android:layout_marginRight">@dimen/cn_authok_lock_widget_horizontal_margin_small
+        </item>
+        <item name="android:focusable">true</item>
+        <item name="android:focusableInTouchMode">false</item>
+        <item name="android:layout_marginEnd">@dimen/cn_authok_lock_widget_horizontal_margin_small
+        </item>
+    </style>
+
+    <style name="Lock.Theme.Widget.Field" parent="Lock.Theme.Text">
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textColorHint">@color/cn_authok_lock_hint_text</item>
+        <item name="android:layout_height">@dimen/cn_authok_lock_widget_height</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:textColor">@color/cn_authok_lock_text</item>
+        <item name="android:paddingLeft">@dimen/cn_authok_lock_widget_with_text_horizontal_padding
+        </item>
+        <item name="android:paddingRight">
+            @dimen/cn_authok_lock_widget_with_text_horizontal_padding
+        </item>
+        <item name="android:layout_marginRight">@dimen/cn_authok_lock_input_field_stroke_width
+        </item>
+        <item name="android:layout_gravity">start</item>
+        <item name="android:textSize">@dimen/cn_authok_lock_field_text</item>
+        <item name="android:paddingStart">@dimen/cn_authok_lock_widget_with_text_horizontal_padding
+        </item>
+        <item name="android:paddingEnd">
+            @dimen/cn_authok_lock_widget_with_text_horizontal_padding
+        </item>
+        <item name="android:layout_marginEnd">@dimen/cn_authok_lock_input_field_stroke_width</item>
+        <item name="android:textAlignment">viewStart</item>
+    </style>
+
+    <style name="Lock.Theme.Widget.Field.Search">
+        <item name="android:layout_height">?android:attr/actionBarSize</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:hint">@string/cn_authok_lock_hint_search_country</item>
+        <item name="android:textSize">@dimen/cn_authok_lock_title_text</item>
+        <item name="android:theme">@style/Lock.Theme</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:imeOptions">actionDone</item>
+        <item name="android:inputType">textAutoCorrect</item>
+    </style>
+
+    <style name="Lock.Theme.Widget.CountryCodeSelector" parent="Lock.Theme.Widget.Field">
+        <item name="android:background">@color/cn_authok_lock_input_country_code_background</item>
+        <item name="android:textColor">@color/cn_authok_lock_hint_text</item>
+        <item name="android:layout_marginRight">0dp</item>
+        <item name="android:paddingLeft">0dp</item>
+        <item name="android:paddingRight">0dp</item>
+        <item name="android:paddingStart">0dp</item>
+        <item name="android:paddingEnd">0dp</item>
+        <item name="android:layout_marginEnd">0dp</item>
+    </style>
+
+    <style name="Lock.Theme.Widget.CountryCodeSelector.CountryName">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:paddingLeft">@dimen/cn_authok_lock_widget_with_text_horizontal_padding
+        </item>
+        <item name="android:paddingStart">@dimen/cn_authok_lock_widget_with_text_horizontal_padding
+        </item>
+    </style>
+
+    <style name="Lock.Theme.Widget.CountryCodeSelector.CountryCode">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">none</item>
+        <item name="android:paddingLeft">
+            @dimen/cn_authok_lock_widget_small_margin
+        </item>
+        <item name="android:paddingRight">
+            @dimen/cn_authok_lock_widget_with_text_horizontal_padding
+        </item>
+        <item name="android:paddingStart">
+            @dimen/cn_authok_lock_widget_small_margin
+        </item>
+        <item name="android:paddingEnd">
+            @dimen/cn_authok_lock_widget_with_text_horizontal_padding
+        </item>
+    </style>
+
+    <style name="Lock.Theme.Widget.SocialButton">
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="Lock.Theme.Widget.SubmitButton">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@color/cn_authok_lock_submit_disabled</item>
+    </style>
+
+    <style name="Lock.Theme.Text.SubmitButton">
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:paddingRight">@dimen/cn_authok_lock_widget_small_margin
+        </item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textSize">@dimen/cn_authok_lock_labeled_submit_button_text</item>
+        <item name="android:textColor">@color/cn_authok_lock_social_text</item>
+        <item name="android:paddingEnd">@dimen/cn_authok_lock_widget_small_margin
+        </item>
+    </style>
+
+    <style name="Lock.Theme.Text.LinkSent">
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:lineSpacingExtra">@dimen/cn_authok_lock_link_sent_text_spacing</item>
+        <item name="android:textColor">@color/cn_authok_lock_passwordless_link_sent_text</item>
+        <item name="android:textSize">@dimen/cn_authok_lock_title_text</item>
+    </style>
+
+    <style name="Lock.Theme.Text.Header">
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textSize">@dimen/cn_authok_lock_header_text</item>
+        <item name="android:text">?attr/Authok.HeaderTitle</item>
+        <item name="android:lines">1</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:layout_marginTop">@dimen/cn_authok_lock_header_logo_vertical_margin
+        </item>
+    </style>
+
+    <style name="Lock.Theme.Widget.Logo">
+        <item name="android:src">?attr/Authok.HeaderLogo</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">@dimen/cn_authok_lock_header_logo_size</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:scaleType">centerInside</item>
+    </style>
+
+    <style name="Lock.Theme.Widget.Header">
+        <item name="android:gravity">center</item>
+        <item name="android:layout_height">@dimen/cn_authok_lock_header_height</item>
+        <item name="android:background">?attr/Authok.HeaderBackground</item>
+    </style>
+</resources>

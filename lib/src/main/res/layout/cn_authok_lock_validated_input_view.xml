@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ cn_authok_lock_validated_field.xml
+  ~
+  ~ Copyright (c) 2022 Authok (http://authok.cn)
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in
+  ~ all copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  ~ THE SOFTWARE.
+  -->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/cn_authok_lock_icon"
+        style="@style/Lock.Theme.Widget.Icon"
+        android:layout_alignParentStart="true"
+        tools:ignore="MissingPrefix"
+        tools:src="@drawable/cn_authok_lock_ic_email" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_toEndOf="@+id/cn_authok_lock_icon">
+
+        <EditText
+            android:id="@+id/cn_authok_lock_input"
+            style="@style/Lock.Theme.Widget.Field"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:background="@null"
+            tools:ignore="Autofill,TextFields,LabelFor"
+            tools:text="email@domain.com" />
+
+        <cn.authok.android.lock.views.ImageCheckbox
+            android:id="@+id/cn_authok_lock_show_password_toggle"
+            style="@style/Lock.Theme.Widget.Icon.PasswordVisibilityToggle"
+            android:checked="true" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/errorDescription"
+        style="@style/Lock.Theme.Text.ValidationError"
+        android:layout_below="@+id/cn_authok_lock_icon"
+        tools:ignore="SelectableText"
+        tools:text="Invalid Email Address " />
+
+    <FrameLayout
+        android:id="@+id/cn_authok_lock_outline"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/cn_authok_lock_widget_height"
+        android:layout_alignParentTop="true" />
+</RelativeLayout>

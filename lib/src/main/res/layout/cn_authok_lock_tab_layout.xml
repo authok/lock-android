@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.tabs.TabLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/cn_authok_lock_tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:tabBackground="@drawable/cn_authok_lock_tab"
+        app:tabMode="fixed"
+        app:tabIndicatorColor="@color/cn_authok_lock_text"
+        app:tabIndicatorHeight="@dimen/cn_authok_lock_widget_tab_strip_height"
+        app:tabPaddingEnd="0dp"
+        app:tabPaddingStart="0dp"/>
+
+    <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_gravity="bottom"
+            android:layout_height="@dimen/cn_authok_lock_widget_tab_strip_height"
+            android:background="@color/cn_authok_lock_tab_underline" />
+
+</FrameLayout>

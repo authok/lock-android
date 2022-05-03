@@ -1,0 +1,22 @@
+{
+  "id": "CBBlULbbyQHSVWj5EqZSTMhUrJAS3UFA",
+  "tenant": "samples",
+  "authorize": "https://test.cn.authok.cn/authorize",
+  "callback": "http://localhost:3000/",
+  "strategies": [{
+      "name": "authok",
+      "connections": [{
+          "name": "database",
+          "domain": null,
+          "forgot_password_url": "https://login.authok.cn/lo/forgot?wtrealm=urn:authok:samples:Username-Password-Authentication",
+          "signup_url": "https://login.authok.cn/lo/signup?wtrealm=urn:authok:samples:Username-Password-Authentication",
+          "passwordPolicy": "fair",
+          "password_complexity_options": {
+            "min_length": 12
+          },
+          "showSignup": true,
+          "showForgot": true,
+          "requires_username": false
+      }]
+  }]
+}

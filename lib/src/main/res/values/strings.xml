@@ -1,0 +1,161 @@
+<!--
+  ~ strings.xml
+  ~
+  ~ Copyright (c) 2022 Authok (http://authok.cn)
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in
+  ~ all copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  ~ THE SOFTWARE.
+  -->
+
+<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@string/cn_authok_lock_social_*">
+    <!-- Social Buttons -->
+    <string name="cn_authok_lock_social_log_in">Sign in with %s</string>
+    <string name="cn_authok_lock_social_sign_up">Sign up with %s</string>
+    <string name="cn_authok_lock_social_apple">Apple</string>
+    <string name="cn_authok_lock_social_dropbox">Dropbox</string>
+    <string name="cn_authok_lock_social_bitbucket">Bitbucket</string>
+    <string name="cn_authok_lock_social_yahoo">Yahoo!</string>
+    <string name="cn_authok_lock_social_linkedin">LinkedIn</string>
+    <string name="cn_authok_lock_social_google_oauth2">Google</string>
+    <string name="cn_authok_lock_social_twitter">Twitter</string>
+    <string name="cn_authok_lock_social_facebook">Facebook</string>
+    <string name="cn_authok_lock_social_amazon">Amazon</string>
+    <string name="cn_authok_lock_social_aol">AOL</string>
+    <string name="cn_authok_lock_social_box">BOX</string>
+    <string name="cn_authok_lock_social_evernote">Evernote</string>
+    <string name="cn_authok_lock_social_evernote_sandbox">Evernote (Sandbox)</string>
+    <string name="cn_authok_lock_social_exact">Exact</string>
+    <string name="cn_authok_lock_social_github">Github</string>
+    <string name="cn_authok_lock_social_instagram">Instagram</string>
+    <string name="cn_authok_lock_social_miicard">miiCard</string>
+    <string name="cn_authok_lock_social_paypal">PayPal</string>
+    <string name="cn_authok_lock_social_paypal_sandbox">PayPal (Sandbox)</string>
+    <string name="cn_authok_lock_social_salesforce">Salesforce</string>
+    <string name="cn_authok_lock_social_salesforce_community">Salesforce (Community)</string>
+    <string name="cn_authok_lock_social_salesforce_sandbox">Salesforce (Sandbox)</string>
+    <string name="cn_authok_lock_social_soundcloud">SoundCloud</string>
+    <string name="cn_authok_lock_social_windowslive">Microsoft</string>
+    <string name="cn_authok_lock_social_yammer">Yammer</string>
+    <string name="cn_authok_lock_social_baidu">百度</string>
+    <string name="cn_authok_lock_social_fitbit">Fitbit</string>
+    <string name="cn_authok_lock_social_planningcenter">Planning Center</string>
+    <string name="cn_authok_lock_social_renren">人人</string>
+    <string name="cn_authok_lock_social_thecity">The City</string>
+    <string name="cn_authok_lock_social_thecity_sandbox">The City (Sandbox)</string>
+    <string name="cn_authok_lock_social_thirtysevensignals">Basecamp</string>
+    <string name="cn_authok_lock_social_vkontakte">VKontakte</string>
+    <string name="cn_authok_lock_social_weibo">新浪微博</string>
+    <string name="cn_authok_lock_social_wordpress">WordPress</string>
+    <string name="cn_authok_lock_social_yandex">Yandex</string>
+    <string name="cn_authok_lock_social_shopify">Shopify</string>
+    <string name="cn_authok_lock_social_dwolla">Dwolla</string>
+
+    <!-- Lock General -->
+    <string name="cn_authok_lock_default_country_name_fallback">US</string>
+    <string name="cn_authok_lock_default_country_code_fallback">+1</string>
+    <string name="cn_authok_lock_header_title">Authok</string>
+    <string name="cn_authok_lock_input_error_email">无效的邮箱</string>
+    <string name="cn_authok_lock_input_error_password">无效的密码</string>
+    <string name="cn_authok_lock_input_error_username_email">无效的用户名/邮箱/手机号</string>
+    <string name="cn_authok_lock_input_error_username" formatted="false" tools:ignore="StringFormatInvalid,TypographyQuotes">Invalid Username. Can only contain between %d to %d alphanumeric characters and \'_\'.</string>
+    <string name="cn_authok_lock_input_error_username_empty" formatted="false">Invalid Username</string>
+    <string name="cn_authok_lock_input_error_code">无效的验证码</string>
+    <string name="cn_authok_lock_input_error_phone_number">无效的手机号</string>
+    <string name="cn_authok_lock_input_error_empty">The value cannot be empty</string>
+    <string name="cn_authok_lock_hint_email">邮箱</string>
+    <string name="cn_authok_lock_hint_password">密码</string>
+    <string name="cn_authok_lock_hint_username">用户名</string>
+    <string name="cn_authok_lock_hint_username_or_email">用户名/邮箱/手机号</string>
+    <string name="cn_authok_lock_hint_code">Code</string>
+    <string name="cn_authok_lock_hint_mfa_code">验证码</string>
+    <string name="cn_authok_lock_hint_phone_number">手机号</string>
+    <string name="cn_authok_lock_hint_search_country">Search your country</string>
+    <string name="cn_authok_lock_action_sign_up">注册</string>
+    <string name="cn_authok_lock_action_log_in">登录</string>
+    <string name="cn_authok_lock_mode_sign_up">注册</string>
+    <string name="cn_authok_lock_mode_log_in">登录</string>
+    <string name="cn_authok_lock_action_send_email">发送邮件</string>
+    <string name="cn_authok_lock_action_forgot_password">忘记密码?</string>
+    <string name="cn_authok_lock_action_single_login_with_corporate">Login with your corporate credentials.</string>
+    <string name="cn_authok_lock_action_login_with_corporate">Please enter your corporate credentials at %s</string>
+    <string name="cn_authok_lock_action_accept">接受</string>
+    <string name="cn_authok_lock_action_cancel">取消</string>
+    <string name="cn_authok_lock_action_ok">OK</string>
+    <string name="cn_authok_lock_single_sign_on_enabled">SINGLE SIGN ON ENABLED</string>
+    <string name="cn_authok_lock_forms_separator">OR</string>
+    <string name="cn_authok_lock_passwordless_sms_forms_separator">Otherwise, enter your phone to sign in or create an account</string>
+    <string name="cn_authok_lock_passwordless_email_forms_separator">Otherwise, enter your email to sign in or create an account</string>
+    <string name="cn_authok_lock_title_change_password">重置密码</string>
+    <string name="cn_authok_lock_title_sign_up_custom_fields">Complete the sign up process</string>
+    <string name="cn_authok_lock_description_change_password">Please enter your email address. We will send you an email to reset your password.</string>
+    <string name="cn_authok_lock_title_passwordless">Code Sent</string>
+    <string name="cn_authok_lock_title_passwordless_code_email_sent">An email with the code has been sent to %s</string>
+    <string name="cn_authok_lock_title_passwordless_code_sms_sent">An SMS with the code has been sent to %s</string>
+    <string name="cn_authok_lock_title_passwordless_link_sent">We sent you a link to sign in to\n %s</string>
+    <string name="cn_authok_lock_title_passwordless_code_retry">Did not get the code?</string>
+    <string name="cn_authok_lock_title_passwordless_got_code">I have a code</string>
+    <string name="cn_authok_lock_title_social_progress_dialog">Logging in</string>
+    <string name="cn_authok_lock_message_social_progress_dialog">Logging in to Authok</string>
+    <string name="cn_authok_lock_sign_up_terms">By signing up, you agree to our terms of\n service and privacy policy</string>
+    <string name="cn_authok_lock_title_passwordless_email">Enter your email address to sign in\n or create an account</string>
+    <string name="cn_authok_lock_title_passwordless_sms">Enter your phone to sign in\n or create an account</string>
+    <string name="cn_authok_lock_sign_up_terms_dialog_title">Terms &amp; Policy</string>
+    <string name="cn_authok_lock_sign_up_terms_dialog_message" formatted="false" tools:ignore="StringFormatInvalid"><![CDATA[
+    By signing up, you agree to our <a href=\'%s\'>terms of service</a> and <a href=\'%s\'>privacy policy</a>
+    ]]></string>
+
+    <!-- Custom Error Messages -->
+    <string name="cn_authok_lock_recoverable_error_title">Can\'t load the login box</string>
+    <string name="cn_authok_lock_recoverable_error_subtitle">Please check your internet\n connection.</string>
+    <string name="cn_authok_lock_recoverable_error_action">Retry</string>
+    <string name="cn_authok_lock_unrecoverable_error_title">Can\'t resolve your request</string>
+    <string name="cn_authok_lock_unrecoverable_error_subtitle">There was an unexpected error while resolving the login box configuration.</string>
+    <string name="cn_authok_lock_unrecoverable_error_subtitle_without_action">There was an unexpected error while resolving the login box configuration, please contact support.</string>
+    <string name="cn_authok_lock_unrecoverable_error_action">Contact support</string>
+    <string name="cn_authok_lock_missing_connections_message">There isn\'t any connection configured for this Application. Check your dashboard configuration on http://authok.cn</string>
+    <string name="cn_authok_lock_configuration_retrieving_error">Error retrieving the Dashboard configuration</string>
+    <string name="cn_authok_lock_enterprise_no_connection_message">THERE WAS NO CONNECTION CONFIGURED FOR THE DOMAIN</string>
+    <string name="cn_authok_lock_db_login_error_message">THERE WAS AN ERROR PROCESSING THE SIGN IN</string>
+    <string name="cn_authok_lock_db_login_error_invalid_credentials_message">WRONG EMAIL OR PASSWORD</string>
+    <string name="cn_authok_lock_db_login_error_mfa_enroll_required">THE USER HAS NOT ENROLLED MULTIFACTOR AUTHENTICATION</string>
+    <string name="cn_authok_lock_db_login_error_invalid_mfa_code_message">THE CODE IS INVALID OR HAS EXPIRED</string>
+    <string name="cn_authok_lock_db_login_error_unauthorized_message">USER IS BLOCKED</string>
+    <string name="cn_authok_lock_db_sign_up_error_message">THERE WAS AN ERROR PROCESSING THE SIGN UP</string>
+    <string name="cn_authok_lock_db_change_password_message_success">WE\'VE JUST SENT YOU AN EMAIL TO RESET YOUR PASSWORD</string>
+    <string name="cn_authok_lock_db_message_change_password_error">COULDN\'T RESET YOUR PASSWORD</string>
+    <string name="cn_authok_lock_db_signup_user_already_exists_error_message">THE USER ALREADY EXISTS</string>
+    <string name="cn_authok_lock_db_signup_password_already_used_error_message">THE PASSWORD WAS USED PREVIOUSLY</string>
+    <string name="cn_authok_lock_db_signup_password_not_strong_error_message">THE PASSWORD IS NOT STRONG ENOUGH</string>
+    <string name="cn_authok_lock_db_too_many_attempts_error_message">YOUR ACCOUNT HAS BEEN BLOCKED AFTER MULTIPLE CONSECUTIVE LOGIN ATTEMPTS</string>
+    <string name="cn_authok_lock_db_password_leaked_error_message">THIS PASSWORD WAS FOUND IN A 3RD PARTY DATA BREACH. PLEASE CHANGE YOUR PASSWORD.</string>
+    <string name="cn_authok_lock_passwordless_code_request_error_message">THERE WAS AN ERROR SENDING THE CODE</string>
+    <string name="cn_authok_lock_passwordless_link_request_error_message">THERE WAS AN ERROR SENDING THE LINK</string>
+    <string name="cn_authok_lock_passwordless_login_error_invalid_credentials_message">WRONG IDENTITY OR PASSCODE</string>
+    <string name="cn_authok_lock_title_mfa_input_code">Two Step Verification</string>
+    <string name="cn_authok_lock_description_mfa_input_code">Please enter a verification code from\n your code generator application.</string>
+
+    <!-- Password Strength/Policies -->
+    <string name="cn_authok_lock_password_strength_identical_chars">No more than 2 identical characters in a row (e.g., “111” not allowed)</string>
+    <string name="cn_authok_lock_password_strength_chars_length" formatted="false" tools:ignore="StringFormatInvalid">At least %d characters in length</string>
+    <string name="cn_authok_lock_password_strength_lowercase_letters">Lower case letters (a-z)</string>
+    <string name="cn_authok_lock_password_strength_uppercase_letters">Upper case letters (A-Z)</string>
+    <string name="cn_authok_lock_password_strength_numbers">Numbers (i.e. 0–9)</string>
+    <string name="cn_authok_lock_password_strength_special_chars">Special characters (e.g. !@#$%^&amp;* )</string>
+    <string name="cn_authok_lock_password_strength_title_at_least">And contain at least 3 of the following 4 types of characters:</string>
+    <string name="cn_authok_lock_password_strength_title_must_have">Must have:</string>
+</resources>

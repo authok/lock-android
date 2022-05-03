@@ -1,0 +1,134 @@
+plugins {
+    id 'com.android.library'
+    id 'maven-publish'
+    id 'signing'
+}
+
+version = '1.0.0'
+
+logger.lifecycle("Using version ${version} for ${name}")
+
+publishing {
+    repositories {
+        maven {
+            // Note: New non-existing packages uploaded since Feb 2021 use a different URL. See https://central.sonatype.org/pages/ossrh-guide.html
+            url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                // Attempts to find the Sonatype credentials.
+                // Fallback values are required so the plugin can still be applied.
+                username = project.findProperty('ossrhUsername') ?: "Missing ossrhUsername"
+                password = project.findProperty('ossrhPassword') ?: "Missing ossrhPassword"
+            }
+        }
+    }
+}
+
+afterEvaluate { project ->
+    publishing.publications {
+        release(MavenPublication) {
+            from components.release
+
+            groupId = 'cn.authok'
+            artifactId = 'lock-android'
+            version = project.version
+
+            pom {
+                name = 'lock-android'
+                description = 'The easiest way of securing your Android mobile apps with Authok & Lock'
+                url = "https://github.com/authok/lock-android"
+
+                licenses {
+                    license {
+                        name = 'The MIT License (MIT)'
+                        url = "https://raw.githubusercontent.com/authok/authok/master/LICENSE"
+                        distribution = 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'authok'
+                        name = 'Authok'
+                        email = 'developer@authok.cn'
+                    }
+                }
+
+                scm {
+                    url = "https://github.com/authok/lock-android"
+                    connection = "scm:git:https://github.com/authok/lock-android.git"
+                    developerConnection = "scm:git:https://github.com/authok/lock-android.git"
+                }
+            }
+        }
+    }
+
+    signing {
+        sign project.publishing.publications.release
+        '''publishing.publications.all { publication ->
+        sign publication
+
+        required { !gradle.taskGraph.allTasks.findAll { it.name ==~ /.*Sonatype.*/ }.isEmpty() }
+        }'''
+    }
+}
+
+android {
+    compileSdkVersion 30
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 30
+        versionCode 1
+        versionName project.version
+        consumerProguardFiles '../proguard/proguard-gson.pro', '../proguard/proguard-otto.pro', '../proguard/proguard-lock-2.pro'
+        // Required since Android Gradle Plugin 4.1 - https://issuetracker.google.com/issues/154275579
+        buildConfigField "String", "VERSION_NAME", "\"$versionName\""
+    }
+
+    lintOptions {
+        disable 'ContentDescription', 'SyntheticAccessor'
+        abortOnError true
+    }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+            // https://github.com/robolectric/robolectric/issues/5115
+            all {
+                systemProperty("javax.net.ssl.trustStoreType", "JKS")
+                maxHeapSize = "1024m"
+            }
+        }
+    }
+
+    unitTestVariants.all {
+        it.mergedFlavor.manifestPlaceholders += [
+            authokDomain: "e.cn.authok.cn",
+            authokScheme: "test"
+        ]
+    }
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.3.1'
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'com.google.code.gson:gson:2.8.9'
+    implementation 'com.squareup:otto:1.3.8'
+    api 'cn.authok:authok-android:1.0.0'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.hamcrest:hamcrest-library:2.2'
+    testImplementation 'org.robolectric:robolectric:4.4'
+    testImplementation 'org.mockito:mockito-core:3.7.7'
+    testImplementation 'com.squareup.okhttp3:okhttp:4.9.3'
+    testImplementation 'com.squareup.okhttp3:mockwebserver:4.9.3'
+    testImplementation 'com.squareup.okhttp3:okhttp-tls:4.9.3'
+    testImplementation 'com.jayway.awaitility:awaitility:1.7.0'
+    testImplementation 'androidx.test.espresso:espresso-intents:3.4.0'
+}

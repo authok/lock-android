@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cn_authok_lock_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:id="@+id/cn_authok_lock_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:isScrollContainer="true" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/cn_authok_lock_result_message"
+        style="@style/Lock.Theme.Text.ResultMessage"
+        android:visibility="gone"
+        tools:background="@color/cn_authok_lock_result_message_error_background"
+        tools:text="There was an error"
+        tools:visibility="visible" />
+
+</RelativeLayout>

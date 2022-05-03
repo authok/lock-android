@@ -1,0 +1,422 @@
+/*
+ * PasswordlessLock.java
+ *
+ * Copyright (c) 2022 Authok (http://authok.cn)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+package cn.authok.android.lock;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StyleRes;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import cn.authok.android.Authok;
+import cn.authok.android.authentication.AuthenticationException;
+import cn.authok.android.authok.BuildConfig;
+import cn.authok.android.lock.LockCallback.LockEvent;
+import cn.authok.android.lock.internal.configuration.Options;
+import cn.authok.android.lock.internal.configuration.Theme;
+import cn.authok.android.lock.provider.AuthResolver;
+import cn.authok.android.provider.AuthHandler;
+import cn.authok.android.provider.CustomTabsOptions;
+import cn.authok.android.util.AuthokUserAgent;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class PasswordlessLock {
+
+    private static final String TAG = PasswordlessLock.class.getSimpleName();
+    private final LockCallback callback;
+    private final Options options;
+
+    /**
+     * Listens to PasswordlessLockActivity broadcasts and fires the correct action on the LockCallback.
+     */
+    private final BroadcastReceiver receiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(@NonNull Context context, @NonNull Intent data) {
+            processEvent(data);
+        }
+    };
+
+    private PasswordlessLock(@NonNull Options options, @NonNull LockCallback callback) {
+        this.options = options;
+        this.callback = callback;
+    }
+
+    /**
+     * Lock.Options holds the configuration used in the Authok Passwordless Authentication API.
+     *
+     * @return the Lock.Options for this Lock instance.
+     */
+    @NonNull
+    public Options getOptions() {
+        return options;
+    }
+
+    /**
+     * Creates a new Lock.Builder instance with the given account and callback.
+     * Use of Passwordless connections requires your Application to have the <b>Resource Owner</b> Legacy Grant Type enabled.
+     * See <a href="https://docs.authok.cn/docs/clients/client-grant-types">Client Grant Types</a> to learn how to enable it.
+     *
+     * @param account  details to use against the Authok Authentication API.
+     * @param callback that will receive the authentication results.
+     * @return a new Lock.Builder instance.
+     */
+    @NonNull
+    public static Builder newBuilder(@Nullable Authok account, @NonNull LockCallback callback) {
+        return new PasswordlessLock.Builder(account, callback);
+    }
+
+    /**
+     * Creates a new Lock.Builder instance with the given callback. The account information
+     * will be retrieved from the String resources file (strings.xml) using
+     * the keys 'cn_authok_client_id' and 'cn_authok_domain'.
+     * Use of Passwordless connections requires your Application to have the <b>Resource Owner</b> Legacy Grant Type enabled.
+     * See <a href="https://docs.authok.cn/docs/clients/client-grant-types">Client Grant Types</a> to learn how to enable it.
+     *
+     * @param callback that will receive the authentication results.
+     * @return a new Lock.Builder instance.
+     */
+    @NonNull
+    public static Builder newBuilder(@NonNull LockCallback callback) {
+        return newBuilder(null, callback);
+    }
+
+    /**
+     * Builds a new intent to launch LockActivity with the previously configured options
+     *
+     * @param context a valid Context
+     * @return the intent to which the user has to call startActivity or startActivityForResult
+     */
+    @NonNull
+    public Intent newIntent(@NonNull Context context) {
+        Intent lockIntent = new Intent(context, PasswordlessLockActivity.class);
+        lockIntent.putExtra(Constants.OPTIONS_EXTRA, options);
+        lockIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        return lockIntent;
+    }
+
+    /**
+     * This method ensures proper Lock's lifecycle handling. Must be called from the class
+     * holding the Lock instance whenever you're done using it. i.e. in the Activity's onDestroy method.
+     *
+     * @param context a valid Context
+     */
+    public void onDestroy(@NonNull Context context) {
+        LocalBroadcastManager.getInstance(context).unregisterReceiver(this.receiver);
+    }
+
+    private void initialize(Context context) {
+        LocalBroadcastManager lbm = LocalBroadcastManager.getInstance(context);
+        lbm.unregisterReceiver(this.receiver);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Constants.AUTHENTICATION_ACTION);
+        filter.addAction(Constants.CANCELED_ACTION);
+        filter.addAction(Constants.INVALID_CONFIGURATION_ACTION);
+        lbm.registerReceiver(this.receiver, filter);
+    }
+
+    private void processEvent(@NonNull Intent data) {
+        if (data.hasExtra(Constants.EXCEPTION_EXTRA)) {
+            callback.onError((AuthenticationException) data.getSerializableExtra(Constants.EXCEPTION_EXTRA));
+            return;
+        }
+        String action = data.getAction();
+        switch (action) {
+            case Constants.AUTHENTICATION_ACTION:
+                Log.v(TAG, "AUTHENTICATION action received in our BroadcastReceiver");
+                callback.onEvent(LockEvent.AUTHENTICATION, data);
+                break;
+            case Constants.CANCELED_ACTION:
+                Log.v(TAG, "CANCELED action received in our BroadcastReceiver");
+                callback.onEvent(LockEvent.CANCELED, new Intent());
+                break;
+            case Constants.INVALID_CONFIGURATION_ACTION:
+                Log.v(TAG, "INVALID_CONFIGURATION_ACTION action received in our BroadcastReceiver");
+                callback.onError(new AuthenticationException("a0.invalid_configuration", data.getStringExtra(Constants.ERROR_EXTRA)));
+                break;
+        }
+    }
+
+    /**
+     * Helper Builder to generate the Lock.Options to use on the Authok Passwordless Authentication.
+     */
+    @SuppressWarnings({"UnusedReturnValue"})
+    public static class Builder {
+        private static final String TAG = Builder.class.getSimpleName();
+        private final Options options;
+        private final LockCallback callback;
+
+        /**
+         * Creates a new Lock.Builder instance with the given account and callback.
+         *
+         * @param account  details to use against the Authok Authentication API.
+         * @param callback that will receive the authentication results.
+         */
+        public Builder(@Nullable Authok account, @NonNull LockCallback callback) {
+            this.callback = callback;
+            options = new Options();
+            options.setAccount(account);
+        }
+
+        /**
+         * Finishes the construction of the Lock.Options and generates a new Lock instance
+         * with those Lock.Options.
+         *
+         * @param context a valid Context
+         * @return a new Lock instance configured as in the Builder.
+         */
+        @NonNull
+        public PasswordlessLock build(@NonNull Context context) {
+            if (options.getAccount() == null) {
+                Log.w(TAG, "com.authok.android.Authok account details not defined. Trying to create it from the String resources.");
+                try {
+                    options.setAccount(new Authok(context));
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalStateException("Missing Authok account information.", e);
+                }
+            }
+            if (callback == null) {
+                Log.e(TAG, "You need to specify the callback object to receive the Authentication result.");
+                throw new IllegalStateException("Missing callback.");
+            }
+            Log.v(TAG, "PasswordlessLock instance created");
+
+            AuthokUserAgent lockUserAgent = new AuthokUserAgent(Constants.LIBRARY_NAME, BuildConfig.VERSION_NAME, cn.authok.android.authok.BuildConfig.VERSION_NAME);
+            options.getAccount().setAuthokUserAgent(lockUserAgent);
+
+            final PasswordlessLock lock = new PasswordlessLock(options, callback);
+            lock.initialize(context);
+            return lock;
+        }
+
+        /**
+         * Control the visibility of the header's Title on the main screen. By default it will show the header's Title on the main screen.
+         *
+         * @param hideMainScreenTitle if it should show or hide the header's Title on the main screen.
+         * @return the current builder instance
+         */
+        @NonNull
+        public Builder hideMainScreenTitle(boolean hideMainScreenTitle) {
+            options.setHideMainScreenTitle(hideMainScreenTitle);
+            return this;
+        }
+
+        /**
+         * Defines the Passwordless type to use in the Authentication as Code. Default value is to use Code
+         *
+         * @return the current Builder instance
+         */
+        @NonNull
+        public Builder useCode() {
+            options.setUseCodePasswordless(true);
+            return this;
+        }
+
+        /**
+         * Defines the Passwordless type to use in the Authentication as Link. Default value is to use Code
+         *
+         * @return the current Builder instance
+         */
+        @NonNull
+        public Builder useLink() {
+            options.setUseCodePasswordless(false);
+            return this;
+        }
+
+        /**
+         * Whether Lock should remember the last used passwordless identity and auto request a sign or not. By default, lock will not remember the last login.
+         *
+         * @return the current Builder instance
+         */
+        @NonNull
+        public Builder rememberLastLogin(boolean remember) {
+            options.setRememberLastPasswordlessLogin(remember);
+            return this;
+        }
+
+        /**
+         * Whether the PasswordlessLockActivity can be closed when pressing the Back key or not.
+         *
+         * @param closable or not. By default, the LockActivity is not closable.
+         * @return the current builder instance
+         */
+        @NonNull
+        public Builder closable(boolean closable) {
+            options.setClosable(closable);
+            return this;
+        }
+
+        /**
+         * Customize Lock's appearance.
+         *
+         * @param theme to use.
+         * @return the current Builder instance
+         */
+        private Builder withTheme(@NonNull Theme theme) {
+            options.withTheme(theme);
+            return this;
+        }
+
+        /**
+         * Authentication Style to use with the given strategy or connection name. It will override any lock defaults.
+         *
+         * @param connectionName to use this style with
+         * @param style          a valid Style with the Authok.BackgroundColor, Authok.Logo and Authok.Name values defined.
+         * @return the current builder instance
+         */
+        @NonNull
+        public Builder withAuthStyle(@NonNull String connectionName, @StyleRes int style) {
+            options.withAuthStyle(connectionName, style);
+            return this;
+        }
+
+        /**
+         * Additional Authentication parameters can be set to use with different Identity Providers.
+         *
+         * @param authenticationParameters a non-null Map containing the parameters as Key-Values
+         * @return the current builder instance
+         */
+        @NonNull
+        public Builder withAuthenticationParameters(@NonNull Map<String, String> authenticationParameters) {
+            options.setAuthenticationParameters(new HashMap<>(authenticationParameters));
+            return this;
+        }
+
+        /**
+         * Locally filters the Authok Connections that are shown in the login widgets.
+         *
+         * @param connections a non-null List containing the allowed Authok Connections.
+         * @return the current builder instance
+         */
+        @NonNull
+        public Builder allowedConnections(@NonNull List<String> connections) {
+            options.setConnections(connections);
+            return this;
+        }
+
+        /**
+         * Uses the given AuthHandlers to query for AuthProviders on a new authentication request.
+         *
+         * @param handlers that Lock will query for AuthProviders.
+         * @return the current builder instance
+         */
+        @NonNull
+        public Builder withAuthHandlers(@NonNull AuthHandler... handlers) {
+            AuthResolver.setAuthHandlers(Arrays.asList(handlers));
+            return this;
+        }
+
+        /**
+         * Sets the Scope to request when performing the Authentication.
+         *
+         * @param scope to use in the Authentication.
+         * @return the current builder instance
+         */
+        @NonNull
+        public Builder withScope(@NonNull String scope) {
+            options.withScope(scope);
+            return this;
+        }
+
+        /**
+         * Sets the Audience or API Identifier to request access to when performing the Authentication.
+         *
+         * @param audience to use in the Authentication.
+         * @return the current builder instance
+         */
+        @NonNull
+        public Builder withAudience(@NonNull String audience) {
+            options.withAudience(audience);
+            return this;
+        }
+
+        /**
+         * Specify a custom Scheme for the redirect URL used when executing a Web Authentication flow
+         * via the Universal Login page. This has no effect on the Passwordless with Link mode.
+         * Default redirect url scheme is 'https'.
+         *
+         * @param scheme to use in the Web Auth redirect uri.
+         * @return the current builder instance
+         */
+        @NonNull
+        public Builder withScheme(@NonNull String scheme) {
+            options.withScheme(scheme);
+            return this;
+        }
+
+        /**
+         * Specify style and other additional configuration for when the Web Auth flow is used with Custom Tabs.
+         *
+         * @param customTabsOptions to use in the Web Auth flow.
+         * @return the current builder instance
+         */
+        @NonNull
+        public Builder withCustomTabsOptions(@NonNull CustomTabsOptions customTabsOptions) {
+            options.withCustomTabsOptions(customTabsOptions);
+            return this;
+        }
+
+        /**
+         * Sets the url of your support page for your application that will be used when an error occurs and Lock is unable to handle it. In this case it will show an error screen and if there is a support url will also show a button to open that page in the browser.
+         *
+         * @param url to your support page or where your customers can request assistance. By default no page is set.
+         * @return the current builder instance
+         */
+        @NonNull
+        public Builder setSupportURL(@NonNull String url) {
+            options.setSupportURL(url);
+            return this;
+        }
+
+        /**
+         * Sets the Connection Scope to request when performing an Authentication with the given Connection.
+         *
+         * @param connectionName to which specify the scopes.
+         * @param scope          recognized by this specific authentication provider.
+         * @return the current builder instance
+         */
+        @NonNull
+        public Builder withConnectionScope(@NonNull String connectionName, @NonNull String... scope) {
+            StringBuilder sb = new StringBuilder();
+            for (String s : scope) {
+                sb.append(s.trim()).append(",");
+            }
+            if (sb.length() > 0) {
+                sb.deleteCharAt(sb.length() - 1);
+                options.withConnectionScope(connectionName, sb.toString());
+            }
+            return this;
+        }
+    }
+}

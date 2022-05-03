@@ -1,0 +1,12 @@
+{
+  "id": "CBBlULbbyQHSVWj5EqZSTMhUrJAS3UFA",
+  "tenant": "samples",
+  "authorize": "https://test.cn.authok.cn/authorize",
+  "callback": "http://localhost:3000/",
+  "strategies": [{
+      "name": "twitter",
+      "connections": [{
+          "name": "twitter"
+      }]
+  }]
+}

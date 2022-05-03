@@ -1,0 +1,5 @@
+rootProject.name = 'lock-android'
+include ':app'
+
+include ':lock'
+project(':lock').projectDir = new File(rootProject.projectDir, '/lib')

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.legacy.widget.Space
+        android:id="@+id/cn_authok_lock_space"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" />
+
+    <ImageView
+        android:id="@+id/cn_authok_lock_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/cn_authok_lock_space"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="@dimen/cn_authok_lock_widget_vertical_margin_error_title"
+        android:src="@drawable/cn_authok_lock_load_error" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/cn_authok_lock_error_title"
+        style="@style/Lock.Theme.Text.Title.Error"
+        android:layout_below="@+id/cn_authok_lock_space"
+        tools:text="@string/cn_authok_lock_unrecoverable_error_title" />
+
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/cn_authok_lock_error_subtitle"
+        style="@style/Lock.Theme.Text.Subtitle.Error"
+        android:layout_below="@+id/cn_authok_lock_error_title"
+        android:layout_marginTop="@dimen/cn_authok_lock_widget_vertical_margin_password_strength"
+        tools:text="@string/cn_authok_lock_unrecoverable_error_subtitle_without_action" />
+
+    <cn.authok.android.lock.views.LinkTextView
+        android:id="@+id/cn_authok_lock_error_action"
+        style="@style/Lock.Theme.Text.ErrorLink"
+        android:layout_below="@+id/cn_authok_lock_error_subtitle"
+        tools:text="@string/cn_authok_lock_unrecoverable_error_action" />
+
+</RelativeLayout>

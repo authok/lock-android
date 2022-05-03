@@ -1,0 +1,70 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="cn.authok.android.lock">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application>
+        <!--Authok WebAuthProvider-->
+        <activity
+            android:name="cn.authok.android.provider.RedirectActivity"
+            android:exported="true"
+            tools:node="replace">
+            <intent-filter android:autoVerify="true">
+            <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="${authokDomain}"
+                    android:pathPrefix="/android/${applicationId}/callback"
+                    android:scheme="${authokScheme}" />
+            </intent-filter>
+        </activity>
+        <!--Authok WebAuthProvider End-->
+
+        <!--Authok Lock-->
+        <activity
+            android:name="cn.authok.android.lock.LockActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/Lock.Theme"/>
+        <!--Authok Lock End-->
+
+        <!--Authok PasswordlessLock-->
+        <activity
+            android:name="cn.authok.android.lock.PasswordlessLockActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/Lock.Theme">
+            <intent-filter android:autoVerify="true">
+            <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="${authokDomain}"
+                    android:pathPrefix="/android/${applicationId}/email"
+                    android:scheme="https" />
+
+                <data
+                    android:host="${authokDomain}"
+                    android:pathPrefix="/android/${applicationId}/sms"
+                    android:scheme="https" />
+            </intent-filter>
+        </activity>
+        <!--Authok PasswordlessLock End-->
+
+        <!--Authok Lock Passwordless SMS Country Code Selection-->
+        <activity
+            android:name="cn.authok.android.lock.CountryCodeActivity"
+            android:exported="false"
+            android:theme="@style/Lock.Theme.ActionBar" />
+        <!--Authok Lock Passwordless SMS Country Code Selection-->
+    </application>
+
+</manifest>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <issue id="IconDuplicates">
+        <ignore path="src/main/res/drawable-hdpi/cn_authok_lock_ic_social_evernote.png" />
+        <ignore path="src/main/res/drawable-hdpi/cn_authok_lock_ic_social_evernote_sandbox.png" />
+        <ignore path="src/main/res/drawable-hdpi/cn_authok_lock_ic_social_salesforce.png" />
+        <ignore path="src/main/res/drawable-hdpi/cn_authok_lock_ic_social_salesforce_community.png" />
+        <ignore path="src/main/res/drawable-hdpi/cn_authok_lock_ic_social_salesforce_sandbox.png" />
+        <ignore path="src/main/res/drawable-hdpi/cn_authok_lock_ic_social_thecity.png" />
+        <ignore path="src/main/res/drawable-hdpi/cn_authok_lock_ic_social_thecity_sandbox.png" />
+        <ignore path="src/main/res/drawable-mdpi/cn_authok_lock_ic_social_evernote.png" />
+        <ignore path="src/main/res/drawable-mdpi/cn_authok_lock_ic_social_evernote_sandbox.png" />
+        <ignore path="src/main/res/drawable-mdpi/cn_authok_lock_ic_social_salesforce.png" />
+        <ignore path="src/main/res/drawable-mdpi/cn_authok_lock_ic_social_salesforce_community.png" />
+        <ignore path="src/main/res/drawable-mdpi/cn_authok_lock_ic_social_salesforce_sandbox.png" />
+        <ignore path="src/main/res/drawable-mdpi/cn_authok_lock_ic_social_thecity.png" />
+        <ignore path="src/main/res/drawable-mdpi/cn_authok_lock_ic_social_thecity_sandbox.png" />
+        <ignore path="src/main/res/drawable-xhdpi/cn_authok_lock_ic_social_evernote.png" />
+        <ignore path="src/main/res/drawable-xhdpi/cn_authok_lock_ic_social_evernote_sandbox.png" />
+        <ignore path="src/main/res/drawable-xhdpi/cn_authok_lock_ic_social_salesforce.png" />
+        <ignore path="src/main/res/drawable-xhdpi/cn_authok_lock_ic_social_salesforce_community.png" />
+        <ignore path="src/main/res/drawable-xhdpi/cn_authok_lock_ic_social_salesforce_sandbox.png" />
+        <ignore path="src/main/res/drawable-xhdpi/cn_authok_lock_ic_social_thecity.png" />
+        <ignore path="src/main/res/drawable-xhdpi/cn_authok_lock_ic_social_thecity_sandbox.png" />
+        <ignore path="src/main/res/drawable-xxhdpi/cn_authok_lock_ic_social_evernote.png" />
+        <ignore path="src/main/res/drawable-xxhdpi/cn_authok_lock_ic_social_evernote_sandbox.png" />
+        <ignore path="src/main/res/drawable-xxhdpi/cn_authok_lock_ic_social_salesforce.png" />
+        <ignore path="src/main/res/drawable-xxhdpi/cn_authok_lock_ic_social_salesforce_community.png" />
+        <ignore path="src/main/res/drawable-xxhdpi/cn_authok_lock_ic_social_salesforce_sandbox.png" />
+        <ignore path="src/main/res/drawable-xxhdpi/cn_authok_lock_ic_social_thecity.png" />
+        <ignore path="src/main/res/drawable-xxhdpi/cn_authok_lock_ic_social_thecity_sandbox.png" />
+        <ignore path="src/main/res/drawable-xxxhdpi/cn_authok_lock_ic_social_evernote.png" />
+        <ignore path="src/main/res/drawable-xxxhdpi/cn_authok_lock_ic_social_evernote_sandbox.png" />
+        <ignore path="src/main/res/drawable-xxxhdpi/cn_authok_lock_ic_social_salesforce.png" />
+        <ignore path="src/main/res/drawable-xxxhdpi/cn_authok_lock_ic_social_salesforce_community.png" />
+        <ignore path="src/main/res/drawable-xxxhdpi/cn_authok_lock_ic_social_salesforce_sandbox.png" />
+        <ignore path="src/main/res/drawable-xxxhdpi/cn_authok_lock_ic_social_thecity.png" />
+        <ignore path="src/main/res/drawable-xxxhdpi/cn_authok_lock_ic_social_thecity_sandbox.png" />
+    </issue>
+</lint>

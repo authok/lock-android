@@ -1,0 +1,621 @@
+/*
+ * LockActivity.java
+ *
+ * Copyright (c) 2022 Authok (http://authok.cn)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+package cn.authok.android.lock;
+
+
+import android.annotation.SuppressLint;
+import android.app.Dialog;
+import android.content.Intent;
+import android.content.res.TypedArray;
+import android.os.Bundle;
+import android.os.Handler;
+import android.text.TextUtils;
+import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import cn.authok.android.Authok;
+import cn.authok.android.AuthokException;
+import cn.authok.android.authentication.AuthenticationAPIClient;
+import cn.authok.android.authentication.AuthenticationException;
+import cn.authok.android.authentication.ParameterBuilder;
+import cn.authok.android.callback.AuthenticationCallback;
+import cn.authok.android.callback.Callback;
+import cn.authok.android.lock.errors.AuthenticationError;
+import cn.authok.android.lock.errors.LoginErrorMessageBuilder;
+import cn.authok.android.lock.errors.SignUpErrorMessageBuilder;
+import cn.authok.android.lock.events.DatabaseChangePasswordEvent;
+import cn.authok.android.lock.events.DatabaseLoginEvent;
+import cn.authok.android.lock.events.DatabaseSignUpEvent;
+import cn.authok.android.lock.events.FetchApplicationEvent;
+import cn.authok.android.lock.events.LockMessageEvent;
+import cn.authok.android.lock.events.OAuthLoginEvent;
+import cn.authok.android.lock.internal.configuration.ApplicationFetcher;
+import cn.authok.android.lock.internal.configuration.Configuration;
+import cn.authok.android.lock.internal.configuration.Connection;
+import cn.authok.android.lock.internal.configuration.Options;
+import cn.authok.android.lock.provider.AuthResolver;
+import cn.authok.android.lock.views.ClassicLockView;
+import cn.authok.android.provider.AuthCallback;
+import cn.authok.android.provider.AuthProvider;
+import cn.authok.android.provider.WebAuthProvider;
+import cn.authok.android.request.AuthenticationRequest;
+import cn.authok.android.request.SignUpRequest;
+import cn.authok.android.result.Challenge;
+import cn.authok.android.result.Credentials;
+import cn.authok.android.result.DatabaseUser;
+import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@SuppressLint("GoogleAppIndexingApiWarning")
+public class LockActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
+
+    private static final String TAG = LockActivity.class.getSimpleName();
+    private static final String KEY_LOGIN_HINT = "login_hint";
+    private static final String KEY_SCREEN_HINT = "screen_hint";
+    private static final String KEY_MFA_TOKEN = "mfa_token";
+    private static final String MFA_CHALLENGE_TYPE_OOB = "oob";
+    private static final long RESULT_MESSAGE_DURATION = 3000;
+    private static final int WEB_AUTH_REQUEST_CODE = 200;
+    private static final int CUSTOM_AUTH_REQUEST_CODE = 201;
+    private static final int PERMISSION_REQUEST_CODE = 202;
+
+    private ApplicationFetcher applicationFetcher;
+    private Configuration configuration;
+    private Options options;
+    private Handler handler;
+
+    private ClassicLockView lockView;
+    private TextView resultMessage;
+
+    private AuthProvider currentProvider;
+    private WebProvider webProvider;
+
+    private LoginErrorMessageBuilder loginErrorBuilder;
+    private SignUpErrorMessageBuilder signUpErrorBuilder;
+    private DatabaseLoginEvent lastDatabaseLogin;
+    private DatabaseSignUpEvent lastDatabaseSignUp;
+
+    public LockActivity() {
+    }
+
+    @VisibleForTesting
+    LockActivity(Configuration configuration, Options options, ClassicLockView lockView, WebProvider webProvider) {
+        this.configuration = configuration;
+        this.options = options;
+        this.lockView = lockView;
+        this.webProvider = webProvider;
+        this.handler = new Handler();
+        this.loginErrorBuilder = new LoginErrorMessageBuilder();
+        this.signUpErrorBuilder = new SignUpErrorMessageBuilder();
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (!hasValidLaunchConfig()) {
+            return;
+        }
+
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        Bus lockBus = new Bus();
+        lockBus.register(this);
+        handler = new Handler(getMainLooper());
+        webProvider = new WebProvider(options);
+
+        setContentView(R.layout.cn_authok_lock_activity_lock);
+        resultMessage = findViewById(R.id.cn_authok_lock_result_message);
+        ScrollView rootView = findViewById(R.id.cn_authok_lock_content);
+        lockView = new ClassicLockView(this, lockBus, options.getTheme());
+        RelativeLayout.LayoutParams lockViewParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        lockView.setLayoutParams(lockViewParams);
+        rootView.addView(lockView);
+
+        loginErrorBuilder = new LoginErrorMessageBuilder(R.string.cn_authok_lock_db_login_error_message, R.string.cn_authok_lock_db_login_error_invalid_credentials_message);
+        signUpErrorBuilder = new SignUpErrorMessageBuilder();
+
+        lockBus.post(new FetchApplicationEvent());
+    }
+
+    private boolean hasValidLaunchConfig() {
+        String errorDescription = null;
+        if (!hasValidOptions()) {
+            errorDescription = "Configuration is not valid and the Activity will finish.";
+        }
+        if (!hasValidTheme()) {
+            errorDescription = "You need to use a Lock.Theme theme (or descendant) with this Activity.";
+        }
+        if (errorDescription == null) {
+            return true;
+        }
+        Intent intent = new Intent(Constants.INVALID_CONFIGURATION_ACTION);
+        intent.putExtra(Constants.ERROR_EXTRA, errorDescription);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        finish();
+        return false;
+    }
+
+    private boolean hasValidTheme() {
+        TypedArray a = getTheme().obtainStyledAttributes(R.styleable.Lock_Theme);
+        boolean validTheme = a.hasValue(R.styleable.Lock_Theme_Authok_HeaderLogo);
+        a.recycle();
+        return validTheme;
+    }
+
+    private boolean hasValidOptions() {
+        options = getIntent().getParcelableExtra(Constants.OPTIONS_EXTRA);
+        if (options == null) {
+            Log.e(TAG, "Lock Options are missing in the received Intent and LockActivity will not launch. " +
+                    "Use the PasswordlessLock.Builder to generate a valid Intent.");
+            return false;
+        }
+
+        boolean launchedForResult = getCallingActivity() != null;
+        if (launchedForResult) {
+            Log.e(TAG, "You're not allowed to start Lock with startActivityForResult.");
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (lockView.onBackPressed() || !options.isClosable()) {
+            return;
+        }
+
+        Log.v(TAG, "User had just closed the activity.");
+        Intent intent = new Intent(Constants.CANCELED_ACTION);
+        LocalBroadcastManager.getInstance(LockActivity.this).sendBroadcast(intent);
+        super.onBackPressed();
+    }
+
+    private void deliverAuthenticationResult(Credentials credentials) {
+        Intent intent = new Intent(Constants.AUTHENTICATION_ACTION);
+        intent.putExtra(Constants.ID_TOKEN_EXTRA, credentials.getIdToken());
+        intent.putExtra(Constants.ACCESS_TOKEN_EXTRA, credentials.getAccessToken());
+        intent.putExtra(Constants.REFRESH_TOKEN_EXTRA, credentials.getRefreshToken());
+        intent.putExtra(Constants.TOKEN_TYPE_EXTRA, credentials.getType());
+        intent.putExtra(Constants.EXPIRES_AT_EXTRA, credentials.getExpiresAt());
+
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        finish();
+    }
+
+    private void deliverAuthenticationError(AuthenticationException exception) {
+        Intent intent = new Intent(Constants.AUTHENTICATION_ACTION);
+        intent.putExtra(Constants.EXCEPTION_EXTRA, exception);
+
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        finish();
+    }
+
+    private void deliverSignUpResult(DatabaseUser result) {
+        Intent intent = new Intent(Constants.SIGN_UP_ACTION);
+        intent.putExtra(Constants.EMAIL_EXTRA, result.getEmail());
+        intent.putExtra(Constants.USERNAME_EXTRA, result.getEmail());
+
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        finish();
+    }
+
+    private void requestMFAChallenge(String mfaToken) {
+        lastDatabaseLogin.setMultifactorToken(mfaToken);
+        AuthenticationAPIClient apiClient = options.getAuthenticationAPIClient();
+        apiClient.multifactorChallenge(mfaToken, null, null)
+                .start(new Callback<Challenge, AuthenticationException>() {
+                    @Override
+                    public void onSuccess(@NonNull Challenge challenge) {
+                        lastDatabaseLogin.setMultifactorChallengeType(challenge.getChallengeType());
+                        lastDatabaseLogin.setMultifactorOOBCode(challenge.getOobCode());
+                        handler.post(() -> {
+                            lockView.showProgress(false);
+                            lockView.showMFACodeForm(lastDatabaseLogin);
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull AuthenticationException ignored) {
+                        // Ignore error:
+                        // Lock will fallback to completing the authentication using OTP MFA.
+                        handler.post(() -> {
+                            lockView.showProgress(false);
+                            lockView.showMFACodeForm(lastDatabaseLogin);
+                        });
+                    }
+                });
+    }
+
+    private void showSuccessMessage(String message) {
+        resultMessage.setBackgroundColor(ContextCompat.getColor(this, R.color.cn_authok_lock_result_message_success_background));
+        resultMessage.setVisibility(View.VISIBLE);
+        resultMessage.setText(message);
+        lockView.showProgress(false);
+        handler.removeCallbacks(resultMessageHider);
+        handler.postDelayed(resultMessageHider, RESULT_MESSAGE_DURATION);
+    }
+
+    private void showErrorMessage(String message) {
+        resultMessage.setBackgroundColor(ContextCompat.getColor(this, R.color.cn_authok_lock_result_message_error_background));
+        resultMessage.setVisibility(View.VISIBLE);
+        resultMessage.setText(message);
+        lockView.showProgress(false);
+        handler.removeCallbacks(resultMessageHider);
+        handler.postDelayed(resultMessageHider, RESULT_MESSAGE_DURATION);
+    }
+
+    private final Runnable resultMessageHider = new Runnable() {
+        @Override
+        public void run() {
+            resultMessage.setVisibility(View.GONE);
+        }
+    };
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (currentProvider != null) {
+            currentProvider.onRequestPermissionsResult(this, requestCode, permissions, grantResults);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        switch (requestCode) {
+            case WEB_AUTH_REQUEST_CODE:
+                lockView.showProgress(false);
+                webProvider.resume(data);
+                break;
+            case CUSTOM_AUTH_REQUEST_CODE:
+                lockView.showProgress(false);
+                if (currentProvider != null) {
+                    currentProvider.authorize(requestCode, resultCode, data);
+                    currentProvider = null;
+                }
+                break;
+            default:
+                super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    @Override
+    protected void onNewIntent(@Nullable Intent intent) {
+        lockView.showProgress(false);
+        if (webProvider.resume(intent)) {
+            return;
+        } else if (currentProvider != null) {
+            currentProvider.authorize(intent);
+            currentProvider = null;
+            return;
+        }
+        super.onNewIntent(intent);
+    }
+
+    @Subscribe
+    public void onFetchApplicationRequest(@NonNull FetchApplicationEvent event) {
+        if (applicationFetcher == null) {
+            Authok account = options.getAccount();
+            applicationFetcher = new ApplicationFetcher(account);
+            applicationFetcher.fetch(applicationCallback);
+        }
+    }
+
+    @Subscribe
+    public void onLockMessage(@NonNull final LockMessageEvent event) {
+        handler.post(() -> showErrorMessage(getString(event.getMessageRes())));
+    }
+
+    @Subscribe
+    public void onOAuthAuthenticationRequest(@NonNull OAuthLoginEvent event) {
+        final String connection = event.getConnection();
+
+        if (event.useActiveFlow()) {
+            lockView.showProgress(true);
+            Log.d(TAG, "Using the /ro endpoint for this OAuth Login Request");
+            AuthenticationRequest request = options.getAuthenticationAPIClient()
+                    .login(event.getUsername(), event.getPassword(), connection);
+            request.addParameters(options.getAuthenticationParameters());
+            if (options.getScope() != null) {
+                request.setScope(options.getScope());
+            }
+            if (options.getAudience() != null) {
+                request.setAudience(options.getAudience());
+            }
+            request.start(authCallback);
+            return;
+        }
+
+        Log.v(TAG, "Looking for a provider to use /authorize with the connection " + connection);
+        currentProvider = AuthResolver.providerFor(event.getStrategy(), connection);
+        if (currentProvider != null) {
+            Map<String, Object> authParameters = new HashMap<>();
+            for (Map.Entry<String, String> e : options.getAuthenticationParameters().entrySet()) {
+                authParameters.put(e.getKey(), e.getValue());
+            }
+            final String connectionScope = options.getConnectionsScope().get(connection);
+            if (connectionScope != null) {
+                authParameters.put(Constants.CONNECTION_SCOPE_KEY, connectionScope);
+            }
+            final String scope = options.getScope();
+            if (scope != null) {
+                authParameters.put(ParameterBuilder.SCOPE_KEY, scope);
+            }
+            final String audience = options.getAudience();
+            if (audience != null) {
+                authParameters.put(ParameterBuilder.AUDIENCE_KEY, audience);
+            }
+            if (!TextUtils.isEmpty(event.getUsername())) {
+                authParameters.put(KEY_LOGIN_HINT, event.getUsername());
+            }
+            currentProvider.setParameters(authParameters);
+            currentProvider.start(this, authProviderCallback, PERMISSION_REQUEST_CODE, CUSTOM_AUTH_REQUEST_CODE);
+            return;
+        }
+
+        Map<String, String> extraAuthParameters = null;
+        if (!TextUtils.isEmpty(event.getUsername())) {
+            extraAuthParameters = Collections.singletonMap(KEY_LOGIN_HINT, event.getUsername());
+        }
+        Log.d(TAG, "Couldn't find an specific provider, using the default: " + WebAuthProvider.class.getSimpleName());
+        webProvider.start(this, connection, extraAuthParameters, new WebCallbackWrapper(authProviderCallback));
+    }
+
+    private void completeDatabaseAuthenticationOnBrowser() {
+        //DBConnection checked for nullability before the API call
+        String connection = configuration.getDatabaseConnection().getName();
+
+        String loginHint = null;
+        String screenHint = null;
+        if (lastDatabaseSignUp != null) {
+            loginHint = lastDatabaseSignUp.getEmail();
+            screenHint = "signup";
+        } else if (lastDatabaseLogin != null) {
+            loginHint = lastDatabaseLogin.getUsernameOrEmail();
+            screenHint = "login";
+        }
+        HashMap<String, String> params = new HashMap<>();
+        params.put(KEY_LOGIN_HINT, loginHint);
+        params.put(KEY_SCREEN_HINT, screenHint);
+
+        webProvider.start(this, connection, params, new WebCallbackWrapper(authProviderCallback));
+    }
+
+    @Subscribe
+    public void onDatabaseAuthenticationRequest(@NonNull DatabaseLoginEvent event) {
+        if (configuration.getDatabaseConnection() == null) {
+            Log.w(TAG, "There is no default Database connection to authenticate with");
+            return;
+        }
+
+        lockView.showProgress(true);
+        lastDatabaseLogin = event;
+        AuthenticationAPIClient apiClient = options.getAuthenticationAPIClient();
+        AuthenticationRequest request;
+        Map<String, String> parameters = new HashMap<>(options.getAuthenticationParameters());
+        if (TextUtils.isEmpty(event.getMultifactorToken())) {
+            // regular database authentication
+            String connection = configuration.getDatabaseConnection().getName();
+            request = apiClient.login(event.getUsernameOrEmail(), event.getPassword(), connection);
+        } else if (MFA_CHALLENGE_TYPE_OOB.equals(lastDatabaseLogin.getMultifactorChallengeType())) {
+            // oob multi-factor authentication
+            request = apiClient.loginWithOOB(event.getMultifactorToken(), event.getMultifactorOOBCode(), event.getMultifactorOTP());
+        } else {
+            // otp multi-factor authentication
+            request = apiClient.loginWithOTP(event.getMultifactorToken(), event.getMultifactorOTP());
+        }
+
+        request.addParameters(parameters);
+        if (options.getScope() != null) {
+            request.setScope(options.getScope());
+        }
+        if (options.getAudience() != null) {
+            request.setAudience(options.getAudience());
+        }
+        request.start(authCallback);
+    }
+
+    @Subscribe
+    public void onDatabaseAuthenticationRequest(@NonNull DatabaseSignUpEvent event) {
+        if (configuration.getDatabaseConnection() == null) {
+            Log.w(TAG, "There is no default Database connection to authenticate with");
+            return;
+        }
+
+        AuthenticationAPIClient apiClient = options.getAuthenticationAPIClient();
+        final String connection = configuration.getDatabaseConnection().getName();
+        lockView.showProgress(true);
+        lastDatabaseSignUp = event;
+
+        if (configuration.loginAfterSignUp()) {
+            SignUpRequest request = event.getSignUpRequest(apiClient, connection)
+                    .addParameters(options.getAuthenticationParameters());
+            if (options.getScope() != null) {
+                request.setScope(options.getScope());
+            }
+            if (options.getAudience() != null) {
+                request.setAudience(options.getAudience());
+            }
+            request.start(authCallback);
+        } else {
+            event.getCreateUserRequest(apiClient, connection)
+                    .start(createCallback);
+        }
+    }
+
+    @Subscribe
+    public void onDatabaseAuthenticationRequest(@NonNull DatabaseChangePasswordEvent event) {
+        if (configuration.getDatabaseConnection() == null) {
+            Log.w(TAG, "There is no default Database connection to authenticate with");
+            return;
+        }
+
+        lockView.showProgress(true);
+        AuthenticationAPIClient apiClient = options.getAuthenticationAPIClient();
+        final String connection = configuration.getDatabaseConnection().getName();
+        apiClient.resetPassword(event.getEmail(), connection)
+                .start(changePwdCallback);
+    }
+
+    //Callbacks
+    private final Callback<List<Connection>, AuthokException> applicationCallback = new Callback<List<Connection>, AuthokException>() {
+        @Override
+        public void onSuccess(@Nullable final List<Connection> connections) {
+            configuration = new Configuration(connections, options);
+            handler.post(() -> lockView.configure(configuration));
+            applicationFetcher = null;
+        }
+
+        @Override
+        public void onFailure(@NonNull final AuthokException error) {
+            Log.e(TAG, "Failed to fetch the application: " + error.getMessage(), error);
+            applicationFetcher = null;
+            handler.post(() -> lockView.configure(null));
+        }
+    };
+
+    private final AuthCallback authProviderCallback = new AuthCallback() {
+        @Override
+        public void onFailure(@NonNull final Dialog dialog) {
+            Log.e(TAG, "Failed to authenticate the user. A dialog is going to be shown with more information.");
+            dialog.show();
+            handler.post(dialog::show);
+        }
+
+        @Override
+        public void onFailure(@NonNull final AuthenticationException exception) {
+            Log.e(TAG, "Failed to authenticate the user: " + exception.getCode(), exception);
+            if (exception.isRuleError() || exception.isAccessDenied()) {
+                deliverAuthenticationError(exception);
+                return;
+            }
+            final AuthenticationError authError = loginErrorBuilder.buildFrom(exception);
+            final String message = authError.getMessage(LockActivity.this);
+            handler.post(() -> showErrorMessage(message));
+        }
+
+        @Override
+        public void onSuccess(@NonNull final Credentials credentials) {
+            deliverAuthenticationResult(credentials);
+        }
+    };
+
+    private final AuthenticationCallback<Credentials> authCallback = new AuthenticationCallback<Credentials>() {
+        @Override
+        public void onSuccess(@Nullable Credentials credentials) {
+            deliverAuthenticationResult(credentials);
+            lastDatabaseLogin = null;
+            lastDatabaseSignUp = null;
+        }
+
+        @Override
+        public void onFailure(@NonNull final AuthenticationException error) {
+            Log.e(TAG, "Failed to authenticate the user: " + error.getCode(), error);
+            if (error.isRuleError() || error.isAccessDenied()) {
+                deliverAuthenticationError(error);
+                return;
+            }
+            if (error.isVerificationRequired()) {
+                completeDatabaseAuthenticationOnBrowser();
+                return;
+            }
+
+            if (error.isMultifactorRequired()) {
+                String mfaToken = (String) error.getValue(KEY_MFA_TOKEN);
+                requestMFAChallenge(mfaToken);
+                return;
+            }
+
+            if (error.isMultifactorTokenInvalid()) {
+                //The MFA Token has expired. The user needs to log in again. Show the username/password form
+                onBackPressed();
+            }
+
+            final AuthenticationError authError = loginErrorBuilder.buildFrom(error);
+            String message = authError.getMessage(LockActivity.this);
+            handler.post(() -> showErrorMessage(message));
+        }
+    };
+
+    private final AuthenticationCallback<DatabaseUser> createCallback = new AuthenticationCallback<DatabaseUser>() {
+        @Override
+        public void onSuccess(@Nullable final DatabaseUser user) {
+            handler.post(() -> deliverSignUpResult(user));
+            lastDatabaseSignUp = null;
+        }
+
+        @Override
+        public void onFailure(@NonNull final AuthenticationException error) {
+            Log.e(TAG, "Failed to create the user: " + error.getCode(), error);
+            if (error.isVerificationRequired()) {
+                completeDatabaseAuthenticationOnBrowser();
+                return;
+            }
+            handler.post(() -> {
+                String message = signUpErrorBuilder.buildFrom(error).getMessage(LockActivity.this);
+                showErrorMessage(message);
+            });
+        }
+    };
+
+    private final AuthenticationCallback<Void> changePwdCallback = new AuthenticationCallback<Void>() {
+        @Override
+        public void onSuccess(@Nullable Void payload) {
+            handler.post(() -> {
+                showSuccessMessage(getString(R.string.cn_authok_lock_db_change_password_message_success));
+                if (options.allowLogIn() || options.allowSignUp()) {
+                    lockView.showChangePasswordForm(false);
+                }
+            });
+
+        }
+
+        @Override
+        public void onFailure(@NonNull AuthenticationException error) {
+            Log.e(TAG, "Failed to reset the user password: " + error.getCode(), error);
+            handler.post(() -> {
+                String message = new AuthenticationError(R.string.cn_authok_lock_db_message_change_password_error).getMessage(LockActivity.this);
+                showErrorMessage(message);
+            });
+        }
+    };
+
+}
