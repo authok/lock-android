@@ -40,15 +40,15 @@ android {
 }
 ```
 
-## Install
+## 安装
 
 Lock is available in [Maven Central](http://search.maven.org). To start using *Lock* add this line to the dependencies of your `build.gradle` file:
 
 ```groovy
-implementation 'cn.authok.android:lock:3.2.0'
+implementation 'cn.authok:lock-android:1.0.0'
 ```
 
-## Usage
+## 使用
 
 If you haven't done yet, go to [Authok](https://authok.cn) and create an Account, it's free! Then create a new [Application](https://mgmt.authok.cn/app/applications) of type *Native* and add a URL in *Allowed Callback URLs* with the following format:
 
@@ -105,7 +105,7 @@ val account = Authok("{YOUR_AUTHOK_CLIENT_ID}", "{YOUR_AUTHOK_DOMAIN}", "{THE_CO
 ```
 
 
-### Email/Password, Enterprise & Social authentication
+### 邮箱/用户名/手机号/密码, 企业级 & 社交认证
 
 Initialize **Lock** and handle the release of its resources appropriately after you're done using it. 
 
